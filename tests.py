@@ -5,7 +5,7 @@ def start():
     database = DatabaseConnection(host='localhost', user='car_hire', password='C@r_H1r3', database_name='car_hire')
     cursor = database.get_cursor()
     customer = Customer("customers", cursor)
-    customer.get_object(1)
+    customer.get_object(0)
     print(customer)
 
 

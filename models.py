@@ -48,5 +48,9 @@ class Customer(Model):
             """
             return self
         return None
+
     def __str__(self):
-        return
+        return "{first_name} {middle_name} {last_name}".format(
+            first_name=self.first_name,
+            middle_name=self.middle_name,
+            last_name=self.last_name)
