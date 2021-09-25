@@ -1,6 +1,6 @@
 from abc import abstractmethod
 import pymysql
-from pymysql.err import OperationalError
+from pymysql.err import OperationalError, IntegrityError, ProgrammingError
 
 
 class DatabaseConnection(object):
@@ -14,6 +14,7 @@ class DatabaseConnection(object):
         self.password = password
         self.host = host
         self.connect_to_db()
+        self.items = None
 
     def connect_to_db(self):
         """
@@ -35,18 +36,48 @@ class DatabaseConnection(object):
         self.cursor = self.connection.cursor()
         return self.cursor
 
+    def get_connection(self):
+        return self.connection
+
 
 class Model(object):
     """
     A model object to
     """
-    def __init__(self, table_name, cursor):
+    def __init__(self, table_name, cursor, connection):
         self.table_name = table_name
         self.cursor = cursor
+        self.connection = connection
 
     @abstractmethod
     def initialize_attributes(self):
         pass
+
+    def insert_new_object(self, table_name=None):
+        if not table_name:
+            table_name = self.table_name
+        print("Table name: ", self.table_name)
+        try:
+            """
+            Inserting a new object for that model, this function must be called after initialize_attributes,
+            or initialize the attributes already in the constructor
+            """
+            query = f"""INSERT INTO {table_name}("""
+            values = ""
+            for item in self.items.keys():
+                print("Item: ", self.items[item])
+                if self.items[item]:
+                    query += item + ","
+                    values += "'" + str(self.items[item]) + "'" + ","
+            query = query[:-1] + ") VALUES (" + values[:-1] + ")"
+            print("Query: ", query)
+            self.cursor.execute(query)
+            self.connection.commit()
+            return self.cursor.lastrowid
+        except IntegrityError as e:
+            print(e)
+            self.connection.rollback()
+
 
     def get_object(self, object_id:int, query=None):
         """
@@ -67,5 +98,5 @@ class Model(object):
         elif self.cursor.rowcount == 0:
             print("404 didn't found any results")
         else:
-            return self.cursor.fetchall()
+            return self.cursor.fetchall()[0]
         return None
