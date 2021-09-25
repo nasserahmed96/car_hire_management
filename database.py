@@ -43,3 +43,29 @@ class Model(object):
     def __init__(self, table_name, cursor):
         self.table_name = table_name
         self.cursor = cursor
+
+    @abstractmethod
+    def initialize_attributes(self):
+        pass
+
+    def get_object(self, object_id:int, query=None):
+        """
+        :param object_id:
+        :return: An object of the class Customer or None if no results found or in case of errors
+        """
+        if not query:
+            query = f"""
+            SELECT * FROM {self.table_name} WHERE {self.table_name}.id={object_id}
+            """
+        self.cursor.execute(query)
+        """
+        If the query returned more than one record that means there is an integrity error
+        """
+        if self.cursor.rowcount > 1:
+            print("The query returned more than one result")
+            return None
+        elif self.cursor.rowcount == 0:
+            print("404 didn't found any results")
+        else:
+            return self.cursor.fetchall()
+        return None
