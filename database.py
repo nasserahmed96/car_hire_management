@@ -78,12 +78,26 @@ class Model(object):
             print(e)
             self.connection.rollback()
 
-    def delete_object(self, object_id:int):
+    def delete_object(self, object_id:int, table_name=None):
         """
-
+        Delete an object from the current table or from the table specified by the user
         :param object_id:
         :return:
         """
+        if not table_name:
+            table_name = self.table_name
+
+        if not self.get_object(object_id):
+            print("Can't find the requested object")
+            return None
+
+        query = f"""DELETE FROM {table_name} WHERE id={object_id}"""
+        print("Query", query)
+        self.cursor.execute(query)
+        self.connection.commit()
+        print("Deleted")
+        return 0
+
     def get_object(self, object_id:int, query=None):
         """
         :param object_id:
@@ -95,13 +109,11 @@ class Model(object):
             """
         self.cursor.execute(query)
         """
-        If the query returned more than one record that means there is an integrity error
+        Return None in case of the rowcount is more than 1(IntegrityError) or rowcount is 0(No results)
         """
-        if self.cursor.rowcount > 1:
-            print("The query returned more than one result")
+        if self.cursor.rowcount > 1 or self.cursor.rowcount == 0:
+            print("Row count: ", self.cursor.rowcount)
             return None
-        elif self.cursor.rowcount == 0:
-            print("404 didn't found any results")
         else:
             return self.cursor.fetchall()[0]
         return None

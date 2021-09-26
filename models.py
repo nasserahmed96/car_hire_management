@@ -64,6 +64,16 @@ class Customer(User):
         else:
             return None
 
+    def delete_customer(self, customer_id):
+        query = f"""SELECT user FROM {self.table_name} where id={customer_id}"""
+        user_id = self.get_object(customer_id, query)
+        if user_id:
+            user_id = user_id[0]
+            result = self.delete_object(object_id=user_id, table_name="users")
+            return result
+        return None
+
+
     def insert_new_customer(self):
         try:
             user_id = self.user.insert_new_object("users")
@@ -72,7 +82,8 @@ class Customer(User):
             print("User id: ", user_id)
             self.items = {"user": user_id}
             customer_id = self.insert_new_object()
-            print("Customer ID: ", customer_id)
+            return customer_id
         except ProgrammingError as e:
             print(e)
+            return None
 

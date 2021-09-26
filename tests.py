@@ -6,8 +6,12 @@ def start():
     database = DatabaseConnection(host='localhost', user='car_hire', password='C@r_H1r3', database_name='car_hire')
     connection = database.get_connection()
     cursor = database.get_cursor()
-    insert_new_customer(cursor, connection)
+    delete_customer(cursor, connection)
+    #insert_new_customer(cursor, connection)
 
+def delete_customer(cursor, connection):
+    customer = Customer(cursor=cursor, connection=connection)
+    customer.delete_object(1)
 
 def insert_new_customer(cursor, connection):
 

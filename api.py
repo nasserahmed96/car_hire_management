@@ -36,7 +36,9 @@ class CustomerManager(Resource):
                             last_name=args['last_name'],
                             email=args['email'],
                             phone_number=args['phone_number'])
-        customer.insert_new_customer()
+        result = customer.insert_new_customer()
+        if not result:
+            abort(status.HTTP_400_BAD_REQUEST, message="An error has occured while saving")
         return (customer, status.HTTP_201_CREATED)
 
     @marshal_with(customer_fields)
@@ -48,12 +50,21 @@ class CustomerManager(Resource):
         else:
             return customer
 
+    def delete(self, id):
+        customer = Customer(cursor=self.cursor, connection=self.connection)
+        result = customer.delete_customer(id)
+        if not result:
+            abort(status.HTTP_404_NOT_FOUND, message="Can't find the requested Customer")
+        return ("Deleted", status.HTTP_200_OK)
+
 customer_manager = CustomerManager()
 
 def run_flask_app():
     app = Flask(__name__)
     api = Api(app)
-    api.add_resource(CustomerManager, '/api/get_customer/<int:id>', '/api/create_customer')
+    api.add_resource(CustomerManager, '/api/get_customer/<int:id>',
+                     '/api/create_customer',
+                     '/api/delete_customer/<int:id>')
     app.run()
 
 if __name__ == "__main__":
