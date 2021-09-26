@@ -60,7 +60,7 @@ class Customer(User):
         if data:
             id, first_name, middle_name, last_name, phone_number, address, status, email = data
             self.initialize_attributes(first_name, last_name, middle_name, email, phone_number)
-            return self
+            return self.items
         else:
             return None
 
