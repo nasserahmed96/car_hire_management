@@ -78,6 +78,27 @@ class Model(object):
             print(e)
             self.connection.rollback()
 
+    def update_object(self, object_id:int, new_items:dict, table_name=None):
+        if not table_name:
+            table_name = self.table_name
+        try:
+            """
+            Updating an object for that model, this function must be called after initialize_attributes,
+            or initialize the attributes already in the constructor
+            """
+            query = f"""UPDATE {table_name} SET """
+            for item in new_items.keys():
+                if new_items[item]:
+                    query += f"""{item}='{new_items[item]}',"""
+            query = query[:-1] + f" WHERE id={object_id}"
+            print("Query: ", query)
+            self.cursor.execute(query)
+            #self.connection.commit()
+            return self.cursor.lastrowid
+        except IntegrityError as e:
+            print(e)
+            self.connection.rollback()
+
     def delete_object(self, object_id:int, table_name=None):
         """
         Delete an object from the current table or from the table specified by the user

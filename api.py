@@ -57,6 +57,22 @@ class CustomerManager(Resource):
             abort(status.HTTP_404_NOT_FOUND, message="Can't find the requested Customer")
         return ("Deleted", status.HTTP_200_OK)
 
+    @marshal_with(customer_fields)
+    def patch(self, id):
+        customer = Customer(cursor=self.cursor, connection=self.connection)
+        parser = reqparse.RequestParser()
+        parser.add_argument('first_name', type=str, required=True)
+        parser.add_argument('middle_name', type=str, required=False)
+        parser.add_argument('last_name', type=str, required=False)
+        parser.add_argument('email', type=str, required=False)
+        parser.add_argument('phone_number', type=str, required=True)
+        args = parser.parse_args()
+        print("Args: ", args)
+        print(type(args))
+
+        customer.update_customer(id, new_items=args)
+
+
 customer_manager = CustomerManager()
 
 def run_flask_app():
@@ -64,7 +80,8 @@ def run_flask_app():
     api = Api(app)
     api.add_resource(CustomerManager, '/api/get_customer/<int:id>',
                      '/api/create_customer',
-                     '/api/delete_customer/<int:id>')
+                     '/api/delete_customer/<int:id>',
+                     '/api/update_customer/<int:id>')
     app.run()
 
 if __name__ == "__main__":

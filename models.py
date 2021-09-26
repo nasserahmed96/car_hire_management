@@ -73,6 +73,14 @@ class Customer(User):
             return result
         return None
 
+    def update_customer(self, customer_id:int, new_items:dict, table_name=None):
+        query = f"""SELECT user FROM {self.table_name} where id={customer_id}"""
+        user_id = self.get_object(customer_id, query)
+        if user_id:
+            user_id = user_id[0]
+            result = self.update_object(object_id=user_id, table_name="users", new_items=new_items)
+            return result
+        return None
 
     def insert_new_customer(self):
         try:
