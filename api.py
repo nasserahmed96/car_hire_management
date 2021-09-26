@@ -53,7 +53,7 @@ customer_manager = CustomerManager()
 def run_flask_app():
     app = Flask(__name__)
     api = Api(app)
-    api.add_resource(CustomerManager, '/api/customers')
+    api.add_resource(CustomerManager, '/api/get_customer/<int:id>', '/api/create_customer')
     app.run()
 
 if __name__ == "__main__":
