@@ -78,7 +78,12 @@ class Model(object):
             print(e)
             self.connection.rollback()
 
+    def delete_object(self, object_id:int):
+        """
 
+        :param object_id:
+        :return:
+        """
     def get_object(self, object_id:int, query=None):
         """
         :param object_id:
